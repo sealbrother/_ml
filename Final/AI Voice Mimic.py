@@ -1,38 +1,45 @@
-AI Voice Mimic — 聲音模仿系統
-📢 說明（開頭最顯眼）
-本專案為一個使用 AI 技術進行聲音模仿 的系統，可將使用者輸入的文字或聲音轉換為特定目標人物的聲音。此系統結合語音合成（TTS）、語音轉語音（Voice Conversion）技術與 LLM 提供語言處理輔助。
+from flask import Flask, request, jsonify, render_template, send_file
+from werkzeug.utils import secure_filename
+import os
+import subprocess
+import uuid
 
-✅ 專案類型與製作說明
-項目	說明
-專案分類	🎧 AI 聲音應用 / TTS / 語音風格轉換
-製作方式	原創設計 + 使用 AI 工具 + 參考開源資源，主要邏輯自行實作
-查詢工具	使用 ChatGPT 查詢 CSS、音訊處理函式、Python TTS 函式庫用法
+app = Flask(__name__)
 
-🧠 專案原理與技術
-核心技術：
-🗣️ Voice Conversion：模仿目標人物聲音（可使用 so-vits-svc 或 RVC）
+UPLOAD_FOLDER = 'uploads'
+RESULT_FOLDER = 'results'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(RESULT_FOLDER, exist_ok=True)
 
-🧾 Text-to-Speech (TTS)：gTTS、Tortoise TTS、Bark、ElevenLabs 等
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-🎧 Whisper：將聲音轉為文字（語音辨識）
+@app.route('/upload', methods=['POST'])
+def upload_audio():
+    if 'audio' not in request.files:
+        return jsonify({'error': 'No audio file part'}), 400
 
-🤖 LLM (如 Gemini)：語言理解與轉換（例如風格改寫）
+    file = request.files['audio']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
 
-🛠️ 系統架構與功能
-後端（Python Flask）
-語音辨識：Whisper 轉文字
+    filename = secure_filename(file.filename)
+    input_path = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(input_path)
 
-語音模仿：so-vits-svc 或 RVC 進行聲音轉換
+    output_filename = f"converted_{uuid.uuid4().hex}.wav"
+    output_path = os.path.join(RESULT_FOLDER, output_filename)
 
-文字轉語音：Bark / ElevenLabs 模仿指定語音風格
+    # 模擬聲音模仿處理流程 (此處用 ffmpeg 替代真實模型)
+    # 替換成 so-vits-svc 推理命令
+    subprocess.call(['ffmpeg', '-i', input_path, output_path])
 
-LLM 輔助：語句優化（如「請幫我把這句話用古風說法說出來」）
+    return jsonify({"output": f"/result/{output_filename}"})
 
-前端:（HTML + JS + CSS）
-語音上傳與播放
+@app.route('/result/<filename>')
+def result(filename):
+    return send_file(os.path.join(RESULT_FOLDER, filename), mimetype='audio/wav')
 
-模仿角色選擇（Ex. 名人聲音、動漫角色）
-
-輸入文字直接模仿語音
-
-語音 vs 模仿聲音比對播放功能
+if __name__ == '__main__':
+    app.run(debug=True, port=5001)
