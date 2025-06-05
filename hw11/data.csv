@@ -1,0 +1,6 @@
+Gender	Age	Height	Weight	family_history_with_overweight	FAVC	FCVC	NCP	CAEC	SMOKE	CH2O	SCC	FAF	TUE	CALC	MTRANS	NObeyesdad
+Male	21	1.70	70	yes	yes	3	3	no	no	2	no	1	1	no	Public_Transportation	Normal_Weight
+Female	22	1.60	50	no	yes	2	2	no	no	1	no	0	1	Frequently	Walking	Insufficient_Weight
+Male	30	1.75	85	yes	yes	2	4	Sometimes	no	3	yes	2	0	no	Bike	Obesity_Type_I
+Female	18	1.55	95	yes	yes	1	4	Frequently	no	2	yes	0	0	no	Walking	Obesity_Type_III
+Male	24	1.80	60	no	no	2	2	no
